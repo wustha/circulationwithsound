@@ -45,6 +45,9 @@ require SIMBIO.'simbio_UTILS/simbio_date.inc.php';
 require MDLBS.'membership/member_base_lib.inc.php';
 require MDLBS.'circulation/circulation_base_lib.inc.php';
 
+
+
+
 function visitOnLoan($member_id)
 {
     global $dbs;
@@ -99,7 +102,9 @@ if (isset($_POST['finish'])) {
         }
         // write log
         utility::writeLogs($dbs, 'member', $memberID, 'circulation', $dbs->escape_string($_SESSION['realname']).' finish circulation transaction with member ('.$memberID.')', 'Transaction', 'finished');
-        echo "<audio src='http://freesoundeffect.net/sites/default/files/thank-you-british-female-voice-sound-effect-9368897.mp3' autoplay ></audio>";
+        
+        echo "<audio src='https://od.lk/s/5e0540b9105d22b76592449eb804d98ca549946bcb75a80733cfe60d63fa77cb/transactOut.mp3' autoplay ></audio>";
+        
         // send message
         echo '<script type="text/javascript">';
         if ($sysconf['transaction_finished_notification']) {
@@ -127,10 +132,13 @@ if (isset($_POST['process']) AND isset($_POST['loanID'])) {
     $circulation->ignore_holidays_fine_calc = $sysconf['ignore_holidays_fine_calc'];
 	$circulation->holiday_dayname = $_SESSION['holiday_dayname'];
 	$circulation->holiday_date = $_SESSION['holiday_date'];
+    // echo "<audio src='https://od.lk/s/4c1cb3112355347bbd0ec432e48f53e0ce18581144d605d95813642d854128d4/Perpanjangan.mp3' autoplay ></audio>";
     if ($_POST['process'] == 'return') {
         $return_status = $circulation->returnItem($loanID);
+        // echo "<audio src='https://od.lk/s/4c1cb3112355347bbd0ec432e48f53e0ce18581144d605d95813642d854128d4/Perpanjangan.mp3' autoplay ></audio>";
         // write log
         utility::writeLogs($dbs, 'member', $dbs->escape_string($_SESSION['memberID']), 'circulation', $dbs->escape_string($_SESSION['realname']).' return item '.$loan_d[0].' for member ('.$dbs->escape_string($_SESSION['memberID']).')', 'Loan', 'Return');
+        // echo "<audio src='https://od.lk/s/4c1cb3112355347bbd0ec432e48f53e0ce18581144d605d95813642d854128d4/Perpanjangan.mp3' autoplay ></audio>";
         if ($circulation->loan_have_overdue) {
             toastr(__('Overdue fines inserted to fines database'))->success();
         }
@@ -151,9 +159,14 @@ if (isset($_POST['process']) AND isset($_POST['loanID'])) {
             echo '<script type="text/javascript">';
             echo 'location.href = \'loan_list.php\';';
             echo '</script>';
+            // echo "<audio src='https://od.lk/s/4c1cb3112355347bbd0ec432e48f53e0ce18581144d605d95813642d854128d4/Perpanjangan.mp3' autoplay ></audio>";
         } else {
             // write log
             utility::writeLogs($dbs, 'member', $dbs->escape_string($_SESSION['memberID']), 'circulation', $dbs->escape_string($_SESSION['realname']).' extend loan for item '.$loan_d[0].' for member ('.$dbs->escape_string($_SESSION['memberID']).')', 'Loan', 'Extended');
+
+            // ujicoba 25/01
+            //echo "<audio src='https://od.lk/s/ddd20fde4476b687405c7dcce2cd3ad28b2c1b8b340672451d8dacadf7456aa4/perpanjangan1.mp3' autoplay ></audio>";
+
             toastr(__('Loan Extended'))->success();
             if ($circulation->loan_have_overdue) {
                 toastr(__('Overdue fines inserted to fines database'))->success();
@@ -163,7 +176,10 @@ if (isset($_POST['process']) AND isset($_POST['loanID'])) {
             echo '</script>';
         }
     }
+    // echo "<audio src='https://od.lk/s/4c1cb3112355347bbd0ec432e48f53e0ce18581144d605d95813642d854128d4/Perpanjangan.mp3' autoplay ></audio>";
     exit();
+    // ujicoba 26/01
+    echo "<audio src='https://od.lk/s/ddd20fde4476b687405c7dcce2cd3ad28b2c1b8b340672451d8dacadf7456aa4/perpanjangan1.mp3' autoplay ></audio>";
 }
 
 // add temporary item to session
@@ -288,7 +304,7 @@ if (isset($_POST['quickReturnID']) AND $_POST['quickReturnID']) {
         LEFT JOIN mst_member_type AS mt ON m.member_type_id=mt.member_type_id
         WHERE l.item_code='".$dbs->escape_string($_POST['quickReturnID'])."' AND is_lent=1 AND is_return=0");
     if ($loan_info_q->num_rows < 1) {
-        echo "<audio src='http://freesoundeffect.net/sites/default/files/fire-alarm-1-sound-effect-27420044.mp3' autoplay ></audio>"; 
+        echo "<audio src='https://od.lk/s/e80f936a8b10bc2702f6df5638f787eba46088cbb14ee385c654a45c49c7fd11/inputsalah.mp3' autoplay ></audio>"; 
         echo '<h2><div style="color: white; font-weight: bold;" class="errorBox">'.__('BUKU/EKSEMPLAR INI SUDAH DIKEMBALIKAN atau TIDAK TERDAFTAR PADA DATABASE PEMINJAMAN.').'</div></h2>';
         echo '<h6><div style="color: blue; font-weight: bold;">'.__('Terima Kasih.').'</div></h6>';
         
@@ -350,12 +366,10 @@ if (isset($_POST['quickReturnID']) AND $_POST['quickReturnID']) {
         $table->table_attr = 'class="border" style="width: 100%; margin-bottom: 5px;" cellpadding="5" cellspacing="0"';
         // append data to table row
         $table->appendTableRow(array(str_replace(array('{itemCode}', '{returnDate}'), array($_POST['quickReturnID'], $return_date), __('Item {itemCode} ..... BERHASIL DIKEMBALIKAN ..... on&nbsp;{returnDate}')))); //mfc
-        $table->appendTableRow(array(__('Title'), $loan_d['title']));
+        $table->appendTableRow(array(__('Title'), $loan_d['title'])); 
         $table->appendTableRow(array(__('Member Name'), $loan_d['member_name'], __('Member ID'), $loan_d['member_id']));
-        $table->appendTableRow(array(__('Loan Date'), $loan_d['loan_date'], __('Due Date'), $loan_d['due_date']));
-        $table->appendTableRow(array(__('_________________')));
-        $table->appendTableRow(array(__('Terima kasih .... ')));
-        
+        $table->appendTableRow(array(__('Loan Date'), date('d F Y', strtotime($loan_d['loan_date'])), __('Tanggal Jatuh Tempo'), date('d F Y', strtotime($loan_d['due_date'])))); //ujicoba ubah tanggal
+                
         // set the cell attributes
         $table->setCellAttr(1, 0, 'class="dataListHeader" style="color: #fff; font-weight: bold;" colspan="4"');
         $table->setCellAttr(2, 0, 'class="alterCell"');
@@ -368,14 +382,41 @@ if (isset($_POST['quickReturnID']) AND $_POST['quickReturnID']) {
         $table->setCellAttr(4, 1, 'class="alterCell2" width="35%"');
         $table->setCellAttr(4, 2, 'class="alterCell" width="15%"');
         $table->setCellAttr(4, 3, 'class="alterCell2" width="35%"');
+
+        // + SISA PINJAMAN
+        $table->appendTableRow(array('__BUKU YANG MASIH DIPINJAM / SISA PINJAMAN__'));
+		$table->appendTableRow(array(__('Item Code'),__('Title'),__('Loan Date'),__('Due Date')));
+		$table->setCellAttr(5, 0, 'class="dataListHeader" style="color: #000; font-weight: bold;" colspan="4"');
+        $table->setCellAttr(6, 0, 'class="alterCell"');
+        $table->setCellAttr(6, 1, 'class="alterCell2"');
+		$table->setCellAttr(6, 2, 'class="alterCell2"');
+		$table->setCellAttr(6, 3, 'class="alterCell2"');
+        $loan_list_q = $dbs->query("SELECT l.item_code, b.title ,l.loan_date, l.due_date FROM loan AS l
+        LEFT JOIN item AS i ON i.item_code=l.item_code
+        LEFT JOIN biblio AS b ON i.biblio_id=b.biblio_id
+        LEFT JOIN member AS m ON l.member_id=m.member_id
+        WHERE l.member_id='".$loan_d['member_id']."' AND is_lent=1 AND is_return=0");
+        $num  = $loan_list_q->num_rows;     
+        if($num>0){
+            $coll = 6;
+            $s = $coll+$num;
+            while($coll<=$s){
+                $table->appendTableRow($loan_list_q->fetch_assoc());
+                $table->setCellAttr($coll , 0, 'class="alterCell"');
+                $table->setCellAttr($coll , 1, 'class="alterCell2"');
+                $table->setCellAttr($coll , 2, 'class="alterCell2"');
+                $table->setCellAttr($coll , 3, 'class="alterCell2"');
+            $coll++;
+            }   
+        }
+        $table->appendTableRow(array(__('_________________')));
+        $table->appendTableRow(array(__('Terima kasih .... ')));
+
         // print out the table
         echo $table->printTable();
-        echo "<audio src='http://freesoundeffect.net/sites/default/files/thank-you-british-female-voice-sound-effect-9368897.mp3' autoplay ></audio>";
-
-
-
-
-
+        // echo "<audio src='http://freesoundeffect.net/sites/default/files/thank-you-british-female-voice-sound-effect-9368897.mp3' autoplay ></audio>";
+        echo "<audio src='https://od.lk/s/0e352edbcdbe199b17b55fbffb337de090c515656816885fb5f574f12dbe88a9/kembali.mp3' autoplay ></audio>";
+           
         // VISITOR VIA QUICK METHOD
          // insert visit
          $checkin_date  = date('Y-m-d H:i:s');
@@ -517,7 +558,7 @@ if (isset($_POST['memberID']) OR isset($_SESSION['memberID'])) {
         echo '<h1><strong><div>'.__('Nomer anggota:').' '.$memberID.' </div></h1></strong>'; //mfc
         echo '<h1><strong><div class="errorBox">'.__('TIDAK VALID!!! TIDAK VALID!!!... TIDAK VALID!!!').'</div></h1></strong>'; //mfc
         echo '<h1><strong><div style="color: red;">'.__('(Tidak terdaftar di database)').'</div></h1></strong>'; //mfc
-        echo "<audio src='http://freesoundeffect.net/sites/default/files/huge-dog-barking-1-sound-effect-17953492.mp3' autoplay ></audio>";
+        echo "<audio src='https://od.lk/s/e80f936a8b10bc2702f6df5638f787eba46088cbb14ee385c654a45c49c7fd11/inputsalah.mp3' autoplay ></audio>";
     } else {
         // get member information
         $member_type_d = $member->getMemberTypeProp();
@@ -606,7 +647,13 @@ if (isset($_POST['memberID']) OR isset($_SESSION['memberID'])) {
         if ($count_d[0] > 0) {
           $active_loan = '';
           $active_loan_list = 'active';
+
+          // pinjaman alert
+          echo "<audio src='https://od.lk/s/0cd576ec9221884938048acf2d8e1c0809ac1d877e6967e3feb953d6d873084a/punyapinjaman.mp3' autoplay ></audio>";
+          
+
           $iframe_src = 'modules/circulation/loan_list.php';
+          // echo "<audio src='https://od.lk/s/b9cdad92fad6f118eff726fcf95f9cf1fb6e9f9e5454830edfea733d666fc599/perpanjangan%26pengembalian.mp3' autoplay ></audio>";
         } else {
           $active_loan = 'active';
           $active_loan_list = '';
@@ -628,6 +675,7 @@ if (isset($_POST['memberID']) OR isset($_SESSION['memberID'])) {
         echo '<a class="nav-item nav-link notAJAX" id="circHistory" href="'.MWB.'circulation/member_loan_hist.php" target="listsFrame">'.__('Riwayat Peminjaman').' (F10)</a>'."\n";
         echo '</div>';
         echo '<iframe src="'.$iframe_src.'" id="listsFrame" name="listsFrame" class="s-iframe expandable"></iframe>'."\n";
+        // echo "<audio src='https://od.lk/s/b9cdad92fad6f118eff726fcf95f9cf1fb6e9f9e5454830edfea733d666fc599/perpanjangan%26pengembalian.mp3' autoplay ></audio>";
     }
 
     // Include Barcode Scanner
@@ -706,5 +754,7 @@ if (isset($_POST['memberID']) OR isset($_SESSION['memberID'])) {
     });
     </script>
     <?php
+    // echo "<audio src='https://od.lk/s/b9cdad92fad6f118eff726fcf95f9cf1fb6e9f9e5454830edfea733d666fc599/perpanjangan%26pengembalian.mp3' autoplay ></audio>";
     exit();
+    // echo "<audio src='https://od.lk/s/b9cdad92fad6f118eff726fcf95f9cf1fb6e9f9e5454830edfea733d666fc599/perpanjangan%26pengembalian.mp3' autoplay ></audio>";
 }
